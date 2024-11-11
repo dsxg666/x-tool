@@ -1,0 +1,26 @@
+.div-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-width {
+    width: 207px;
+}
+
+.link-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 1em;
+}
+
+.icon-container .github {
+    font-size: 2em;
+}

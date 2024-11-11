@@ -1,0 +1,10 @@
+.div-register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.register-width {
+    width: 250px;
+}

@@ -1,0 +1,125 @@
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.message {
+    display: flex;
+    align-items: center;
+}
+
+.message-self {
+    justify-content: flex-end;
+}
+
+.message-other {
+    justify-content: flex-start;
+}
+
+.message-content {
+    display: flex;
+    align-items: center;
+}
+
+.message-self .content {
+    background-color: #a9ea7a;
+    border-radius: 5px;
+    padding: 10px;
+    position: relative;
+}
+
+.message-self .content::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -7px;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 7px solid #a9ea7a;
+    transform: translateY(-50%);
+}
+
+.message-other .content {
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    position: relative;
+}
+
+.message-other .content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -7px;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-right: 7px solid #fff;
+    transform: translateY(-50%);
+}
+
+.inputBox {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    font-size: 16px;
+}
+
+.inputBox:deep(.emoji-img) {
+    vertical-align: bottom;
+    padding-bottom: 1px;
+    width: 21px;
+    height: 21px;
+}
+
+.inputBox:focus {
+    outline: none;
+    caret-color: #3478f6;
+}
+
+.emoji-container {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.emoji-item {
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.contentBox {
+    font-size: 16px;
+    color: black;
+}
+
+.contentBox:deep(.emoji-img) {
+    vertical-align: bottom;
+    padding-bottom: 1px;
+    width: 21px;
+    height: 21px;
+}
+
+.lastMessage:deep(.emoji-img) {
+    vertical-align: bottom;
+    width: 16px;
+    height: 16px;
+}
+
+.showConversationBgc {
+    background-color: #eee;
+}
