@@ -75,24 +75,35 @@ function getRandomExcluding(num1, num2) {
 }
 
 const loadSong = (index) => {
-  audio.src = getSongFilePath(data.list[index].title, data.list[index].artist)
-  progress.value = 0
-  duration.value = timeToSeconds(data.list[index].time)
-  currentSongArtist.value = data.list[index].artist
-  currentSongTitle.value = data.list[index].title
-  currentSongCover.value = getSongCoverPath(data.list[index].title, data.list[index].artist)
-  isPlaying.value = true
-  audio.play()
+  for (let song of data.list) {
+    if (song.id === String(index + 1)) {
+
+      audio.src = getSongFilePath(song.title, song.artist)
+      progress.value = 0
+      duration.value = timeToSeconds(song.time)
+      currentSongArtist.value = song.artist
+      currentSongTitle.value = song.title
+      currentSongCover.value = getSongCoverPath(song.title, song.artist)
+      isPlaying.value = true
+      audio.play()
+      break
+    }
+  }
 }
 
 const loadLyricSource = (index) => {
-  loadLyrics(getSongLrcPath(data.list[index].title, data.list[index].artist))
+  for (let song of data.list) {
+    if (song.id === String(index + 1)) {
+      loadLyrics(getSongLrcPath(song.title, song.artist))
+      break
+    }
+  }
 }
 
 const prevSong = () => {
   if (playMode.value === 0 || playMode.value === 2) {
     currentSongIndex.value = (currentSongIndex.value - 1 + data.list.length) % data.list.length
-    let index = currentSongIndex.value
+    let index = parseInt(data.list[currentSongIndex.value].id) - 1
     loadSong(index)
     loadLyricSource(index)
   } else if (playMode.value === 1) {
@@ -105,7 +116,7 @@ const prevSong = () => {
 const nextSong = () => {
   if (playMode.value === 0 || playMode.value === 2) {
     currentSongIndex.value = (currentSongIndex.value + 1) % data.list.length
-    let index = currentSongIndex.value
+    let index = parseInt(data.list[currentSongIndex.value].id) - 1
     loadSong(index)
     loadLyricSource(index)
   } else if (playMode.value === 1) {
@@ -228,7 +239,12 @@ const tableRowClassName = ({row, rowIndex}) => {
 
 const handlerSongClick = (row) => {
   let index = row.id - 1
-  currentSongIndex.value = index
+  for (let i = 0; i < data.list.length; i++) {
+    if (data.list[i].id === row.id) {
+      currentSongIndex.value = i
+      break
+    }
+  }
   loadSong(index)
   loadLyricSource(index)
 }
@@ -304,13 +320,11 @@ onUnmounted(() => {
       </el-table-column>
       <el-table-column label="Favorite">
         <template #default="scope">
-          <el-text v-show="!data.listFavoriteMap.get(scope.row.id)" @click="favorite(scope.row)" size="large"
-                   style="color: grey;cursor: pointer">
-            <font-awesome-icon :icon="['fas', 'heart']"/>
+          <el-text v-show="!data.listFavoriteMap.get(scope.row.id)" @click="favorite(scope.row)" size="large" style="color: grey;cursor: pointer">
+            <font-awesome-icon :icon="['fas', 'heart']" />
           </el-text>
-          <el-text v-show="data.listFavoriteMap.get(scope.row.id)" @click="cancelFavorite(scope.row)" size="large"
-                   style="color: orangered;cursor: pointer">
-            <font-awesome-icon :icon="['fas', 'heart']"/>
+          <el-text v-show="data.listFavoriteMap.get(scope.row.id)" @click="cancelFavorite(scope.row)" size="large" style="color: orangered;cursor: pointer">
+            <font-awesome-icon :icon="['fas', 'heart']" />
           </el-text>
         </template>
       </el-table-column>
@@ -324,16 +338,16 @@ onUnmounted(() => {
   </div>
   <div class="music-player">
     <el-row>
-      <el-col :span="4">
+      <el-col :span="5">
         <div class="song-info">
           <el-avatar :src="currentSongCover" size="large" shape="square"/>
           <div class="song-details">
-            <p class="song-name">{{ currentSongTitle }}</p>
+            <p class="song-name"><el-text >{{ currentSongTitle }}</el-text></p>
             <p class="song-artist">{{ currentSongArtist }}</p>
           </div>
         </div>
       </el-col>
-      <el-col :span="16">
+      <el-col :span="14">
         <div class="controls">
           <el-button style="font-size: 20px" link @click="prevSong">
             <font-awesome-icon :icon="['fas', 'backward-step']"/>
@@ -358,7 +372,7 @@ onUnmounted(() => {
           <el-text style="margin: 0 20px">{{ formatTime(duration) }}</el-text>
         </div>
       </el-col>
-      <el-col :span="4">
+      <el-col :span="5">
         <div class="song-setting">
           <el-tooltip
               effect="dark"
