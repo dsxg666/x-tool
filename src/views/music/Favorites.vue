@@ -107,7 +107,7 @@ const prevSong = () => {
     loadSong(index)
     loadLyricSource(index)
   } else if (playMode.value === 1) {
-    let index = getRandomExcluding(data.list.length, currentSongIndex)
+    let index = parseInt(data.list[getRandomExcluding(data.list.length, currentSongIndex)].id) - 1
     loadSong(index)
     loadLyricSource(index)
   }
@@ -120,7 +120,7 @@ const nextSong = () => {
     loadSong(index)
     loadLyricSource(index)
   } else if (playMode.value === 1) {
-    let index = getRandomExcluding(data.list.length, currentSongIndex)
+    let index = parseInt(data.list[getRandomExcluding(data.list.length, currentSongIndex)].id) - 1
     loadSong(index)
     loadLyricSource(index)
   }
@@ -129,11 +129,11 @@ const nextSong = () => {
 const endedNextSong = () => {
   if (playMode.value === 0) {
     currentSongIndex.value = (currentSongIndex.value + 1) % data.list.length
-    let index = currentSongIndex.value
+    let index = parseInt(data.list[currentSongIndex.value].id) - 1
     loadSong(index)
     loadLyricSource(index)
   } else if (playMode.value === 1) {
-    let index = getRandomExcluding(data.list.length, currentSongIndex)
+    let index = parseInt(data.list[getRandomExcluding(data.list.length, currentSongIndex)].id) - 1
     loadSong(index)
     loadLyricSource(index)
   } else if (playMode.value === 2) {
