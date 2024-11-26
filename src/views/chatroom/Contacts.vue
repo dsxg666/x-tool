@@ -5,7 +5,7 @@ import axiosUtilObj from "@/utils/axios.js";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {useRouter} from 'vue-router'
 import localStoreUtilObj from "@/utils/localstore.js";
-import { InfoFilled } from '@element-plus/icons-vue'
+import {InfoFilled} from '@element-plus/icons-vue'
 
 const store = infoStore()
 const router = useRouter()
@@ -70,8 +70,11 @@ const openAddBox = () => {
     inputType: 'textarea',
     inputValue: "Hello, I'm " + store.data.username,
   })
-      .then( async ({value}) => {
-        let res = await axiosUtilObj.postToken("/api/auth/chatroom/addFriendRequest", store.data.token, {id: toAddFriendId.value, remark: value})
+      .then(async ({value}) => {
+        let res = await axiosUtilObj.postToken("/api/auth/chatroom/addFriendRequest", store.data.token, {
+          id: toAddFriendId.value,
+          remark: value
+        })
         if (res.code === '100') {
           ElMessage({
             message: "Your friend request was successfully sent.",
@@ -95,7 +98,10 @@ const openAddBox = () => {
 const enterMessage = async (row) => {
   let id = 'user' + row.id
 
-  let res = await axiosUtilObj.postToken("/api/auth/chatroom/isFriend", store.data.token, {friendId: row.id, selfId: store.data.userId})
+  let res = await axiosUtilObj.postToken("/api/auth/chatroom/isFriend", store.data.token, {
+    friendId: row.id,
+    selfId: store.data.userId
+  })
   if (res.data === '1') {
     localStoreUtilObj.set('showConversation', id)
 
@@ -112,7 +118,7 @@ const enterMessage = async (row) => {
       }
     }
 
-    await router.push({path: '/chatroom/conversations'})
+    await router.push({path: '/' + store.data.path + '/chatroom/conversations'})
   } else if (res.data === '0') {
     ElMessage.error("You're not friends anymore")
     await delay(1000); // 等待 1 秒
@@ -156,7 +162,9 @@ const deleteFriend = (row) => {
         placeholder="Please input UserId"
     >
       <template #append>
-        <el-button @click="addFriend"><font-awesome-icon :icon="['fas', 'user-plus']" /></el-button>
+        <el-button @click="addFriend">
+          <font-awesome-icon :icon="['fas', 'user-plus']"/>
+        </el-button>
       </template>
     </el-input>
   </div>
@@ -179,8 +187,10 @@ const deleteFriend = (row) => {
     <el-table-column prop="username" label="Name"/>
     <el-table-column label="Status">
       <template #default="scope">
-        <el-text v-if="data.friendStatusList[data.friendDetailList.indexOf(scope.row)] === '1'" type="success">Online</el-text>
-        <el-text v-if="data.friendStatusList[data.friendDetailList.indexOf(scope.row)] === '0'" type="info">Offline</el-text>
+        <el-text v-if="data.friendStatusList[data.friendDetailList.indexOf(scope.row)] === '1'" type="success">Online
+        </el-text>
+        <el-text v-else-if="data.friendStatusList[data.friendDetailList.indexOf(scope.row)] === '0'" type="info">Offline
+        </el-text>
       </template>
     </el-table-column>
     <el-table-column fixed="right" min-width="120">

@@ -3,13 +3,12 @@ import {infoStore} from '@/store/store.js'
 import localStoreUtilObj from '@/utils/localstore.js'
 import axiosUtilObj from '@/utils/axios.js'
 import timeUtilObj from '@/utils/time.js'
-import {useRouter, useRoute} from 'vue-router'
+import {useRouter} from 'vue-router'
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElIcon, ElMessage, ElMessageBox} from 'element-plus'
 
 const store = infoStore()
 const router = useRouter()
-const route = useRoute();
 
 const logout = () => {
   localStoreUtilObj.remove('info')
@@ -152,8 +151,8 @@ const openUsernameBox = () => {
   ElMessageBox.prompt('Please input your new username', 'Modify username', {
     confirmButtonText: 'OK',
     cancelButtonText: 'Cancel',
-    inputPattern: /^.{1,8}$/,
-    inputErrorMessage: 'Username must be 1~8 character',
+    inputPattern: /^.{1,10}$/,
+    inputErrorMessage: 'Username must be 1~10 character',
   })
       .then(({value}) => {
         axiosUtilObj.postToken('/api/auth/user/modifyUsername', store.data.token, {
