@@ -1,10 +1,15 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import {infoStore} from "@/store/store.js";
+
+const store = infoStore()
+
+
 
 const router = useRouter()
 
 const goHome = () => {
-  router.push('/') // 跳转到首页
+  router.push('/'+store.data.path) // 跳转到首页
 }
 </script>
 

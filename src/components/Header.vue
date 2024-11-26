@@ -3,17 +3,47 @@ import {infoStore} from '@/store/store.js'
 import localStoreUtilObj from '@/utils/localstore.js'
 import axiosUtilObj from '@/utils/axios.js'
 import timeUtilObj from '@/utils/time.js'
-import {useRouter} from 'vue-router'
+import {useRouter, useRoute} from 'vue-router'
 import {reactive, ref, onMounted, computed} from 'vue'
 import {ElIcon, ElMessage, ElMessageBox} from 'element-plus'
 
 const store = infoStore()
 const router = useRouter()
+const route = useRoute();
 
 const logout = () => {
   localStoreUtilObj.remove('info')
   router.push('/login')
 }
+
+const logoVar = '/' + store.data.path
+
+const showChatroom = ref(store.asideShowData.chatroom)
+const showTodolist = ref(store.asideShowData.todolist)
+const showGame = ref(store.asideShowData.game)
+const showBlog = ref(store.asideShowData.blog)
+const showMusic = ref(store.asideShowData.music)
+const showEnglish = ref(store.asideShowData.english)
+
+const handleChatroomSwitchChange = (value) => {
+  store.updateChatroomShow(value)
+}
+const handleTodolistSwitchChange = (value) => {
+  store.updateTodolistShow(value)
+}
+const handleGameSwitchChange = (value) => {
+  store.updateGameShow(value)
+}
+const handleBlogSwitchChange = (value) => {
+  store.updateBlogShow(value)
+}
+const handleMusicSwitchChange = (value) => {
+  store.updateMusicShow(value)
+}
+const handleEnglishSwitchChange = (value) => {
+  store.updateEnglishShow(value)
+}
+
 
 const avatarUrl = ref(`${import.meta.env.VITE_API_URL}/api/base/getAvatar/${store.data.userId}`)
 
@@ -34,7 +64,19 @@ const generalData = reactive({
     {property: 'Username', content: ''},
     {property: 'Email', content: ''},
     {property: 'Password', content: ''},
-    {property: 'Avatar', content: ''}
+    {property: 'Avatar', content: ''},
+    {property: 'Path', content: ''},
+  ]
+})
+
+const showData = reactive({
+  list: [
+    {sidebar: 'Chatroom'},
+    {sidebar: 'Todolist'},
+    {sidebar: 'Game'},
+    {sidebar: 'Blog'},
+    {sidebar: 'Music'},
+    {sidebar: 'English'},
   ]
 })
 
@@ -55,6 +97,42 @@ const openPasswordBox = () => {
         }).then(result => {
           if (result.code === '100') {
             ElMessage.success('Modify successfully!')
+          } else {
+            ElMessage.error(result.message)
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      })
+      .catch(() => {
+        ElMessage({
+          type: 'info',
+          message: 'Canceled',
+        })
+      })
+}
+
+function replaceFirstSegment(path, newSegment) {
+  // 使用正则表达式匹配路径的第一部分
+  return path.replace(/^\/[^\/]+/, `/${newSegment}`);
+}
+
+const openPathBox = () => {
+  ElMessageBox.prompt('Please input your new path', 'Modify path', {
+    confirmButtonText: 'OK',
+    cancelButtonText: 'Cancel',
+    inputPattern: /^[a-zA-Z0-9]{1,20}$/,
+    inputErrorMessage: 'Path must be contain 1~20 letters and numbers',
+  })
+      .then(({value}) => {
+        axiosUtilObj.postToken('/api/auth/user/modifyPath', store.data.token, {
+          id: store.data.userId,
+          path: value
+        }).then(result => {
+          if (result.code === '100') {
+            generalData.list[5].content = value
+            store.updatePath(value)
+            logout()
           } else {
             ElMessage.error(result.message)
           }
@@ -185,6 +263,7 @@ onMounted(() => {
     generalData.list[0].content = result.data.id
     generalData.list[1].content = result.data.username
     generalData.list[2].content = result.data.email
+    generalData.list[5].content = result.data.path
     emailLastUpdateDate = timeUtilObj.StrToFormatDate(result.data.emailUpdateAt)
   }).catch(err => {
     console.log(err)
@@ -200,7 +279,7 @@ const uploadPath = ref(`${import.meta.env.VITE_API_URL}/api/auth/user/uploadAvat
       :ellipsis="false"
   >
     <el-menu-item class="custom-menu-item">
-      <a href="/">
+      <a :href="logoVar">
         <img
             style="width: 100px;vertical-align: middle"
             src="/logo-color.png"
@@ -259,26 +338,57 @@ const uploadPath = ref(`${import.meta.env.VITE_API_URL}/api/auth/user/uploadAvat
             <el-table-column label="Operation">
               <template #default="scope">
                 <el-button v-if="scope.row.property === 'Username'" link type="primary" size="small"
-                           @click="openUsernameBox()">Modify
+                           @click="openUsernameBox">Modify
                 </el-button>
-                <el-button v-if="scope.row.property === 'Email'" link type="primary" size="small"
-                           @click="openEmailBox()">Modify
+                <el-button v-else-if="scope.row.property === 'Email'" link type="primary" size="small"
+                           @click="openEmailBox">Modify
                 </el-button>
                 <el-tooltip
-                    v-if="scope.row.property === 'Email'"
+                    v-else-if="scope.row.property === 'Email'"
                     effect="dark"
                     content="Attention! It can only be modified once a month."
                     placement="top"
                 >
                   <el-text style="margin-left: 10px; user-select: none" type="warning" size="small">hint</el-text>
                 </el-tooltip>
-                <el-button v-if="scope.row.property === 'Password'" link type="primary" size="small"
-                           @click="openPasswordBox()">Modify
+                <el-button v-else-if="scope.row.property === 'Password'" link type="primary" size="small"
+                           @click="openPasswordBox">Modify
                 </el-button>
-                <el-button v-if="scope.row.property === 'Avatar'" link type="primary" size="small"
+                <el-button v-else-if="scope.row.property === 'Avatar'" link type="primary" size="small"
                            @click="avatarBoxVisible = true">Modify
                 </el-button>
-
+                <el-button v-else-if="scope.row.property === 'Path'" link type="primary" size="small"
+                           @click="openPathBox">Modify
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane>
+        <template #label>
+        <span>
+          <el-icon><font-awesome-icon :icon="['fas', 'eye']"/></el-icon>
+          <span>&nbsp;&nbsp;Show&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </span>
+        </template>
+        <div style="padding: 0 10px">
+          <el-table :data="showData.list" style="width: 100%">
+            <el-table-column prop="sidebar" label="Application"/>
+            <el-table-column label="Operation">
+              <template #default="scope">
+                <el-switch v-if="scope.row.sidebar === 'Chatroom'" v-model="showChatroom"
+                           @change="handleChatroomSwitchChange"/>
+                <el-switch v-else-if="scope.row.sidebar === 'Todolist'" v-model="showTodolist"
+                           @change="handleTodolistSwitchChange"/>
+                <el-switch v-else-if="scope.row.sidebar === 'Game'" v-model="showGame"
+                           @change="handleGameSwitchChange"/>
+                <el-switch v-else-if="scope.row.sidebar === 'Blog'" v-model="showBlog"
+                           @change="handleBlogSwitchChange"/>
+                <el-switch v-else-if="scope.row.sidebar === 'Music'" v-model="showMusic"
+                           @change="handleMusicSwitchChange"/>
+                <el-switch v-else-if="scope.row.sidebar === 'English'" v-model="showEnglish"
+                           @change="handleEnglishSwitchChange"/>
               </template>
             </el-table-column>
           </el-table>

@@ -1,9 +1,15 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {infoStore} from '@/store/store.js'
 import axiosUtilObj from '@/utils/axios.js'
-import timeUtilObj from '@/utils/time.js'
 
 const routes = [
+    {
+        path: "/",
+        component: () => import("@/views/Login.vue"),
+        meta: {
+            title: "Login"
+        },
+    },
     {
         path: "/login",
         component: () => import("@/views/Login.vue"),
@@ -19,7 +25,7 @@ const routes = [
         }
     },
     {
-        path: "/",
+        path: "/:username",
         component: () => import("@/views/Index.vue"),
         meta: {
             title: "lanKaiYun Tool",
@@ -27,7 +33,7 @@ const routes = [
         },
         children:[
             {
-                path: "/",
+                path: "",
                 component: () => import("@/views/Home.vue"),
                 meta: {
                     title: "Home",
@@ -194,6 +200,13 @@ const routes = [
                     title: "Music Favorites",
                 }
             },
+            {
+                path: "english/pk",
+                component: () => import('@/views/english/PK.vue'),
+                meta: {
+                    title: "English PK",
+                }
+            }
         ]
     },
     {
@@ -226,6 +239,11 @@ router.beforeEach(async (to, from, next) => {
             if (verifyResultObj.code !== '100') {
                 console.error(verifyResultObj.message)
                 router.push("/login")
+            }
+
+            // check custom path
+            if (to.fullPath.split('/')[1] !== store.data.path) {
+                router.push("/404/unauthorized")
             }
 
             // let startTime = timeUtilObj.getNowFormatDate()

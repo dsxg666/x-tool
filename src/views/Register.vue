@@ -117,7 +117,7 @@ const font = reactive({
                 v-model="formData.username"
                 type="text"
                 placeholder="Please input username"
-                maxlength="8"
+                maxlength="10"
                 show-word-limit
                 clearable
             />

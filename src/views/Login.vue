@@ -101,7 +101,7 @@ const passwordTabSubmit = () => {
           let [headerBase64, payloadBase64, signatureBase64] = token.split('.')
           let payload = atob(payloadBase64)
           let payloadObj = JSON.parse(payload)
-          store.save(payloadObj.userId, payloadObj.username, payloadObj.exp, token)
+          store.save(payloadObj.userId, payloadObj.username, payloadObj.exp, token, payloadObj.path)
 
           if (isRememberPass.value) {
             localStoreUtilObj.set('email', passwordTabFormData.email)
@@ -110,7 +110,7 @@ const passwordTabSubmit = () => {
             localStoreUtilObj.remove('email')
             localStoreUtilObj.remove('password')
           }
-          router.push('/')
+          router.push('/' + payloadObj.path)
         }
       })
     } else {
@@ -131,8 +131,8 @@ const codeTabSubmit = () => {
           let [headerBase64, payloadBase64, signatureBase64] = token.split('.')
           let payload = atob(payloadBase64)
           let payloadObj = JSON.parse(payload)
-          store.save(payloadObj.userId, payloadObj.username, payloadObj.exp, token)
-          router.push('/')
+          store.save(payloadObj.userId, payloadObj.username, payloadObj.exp, token, payloadObj.path)
+          router.push('/' + payloadObj.path)
         }
       })
     } else {
