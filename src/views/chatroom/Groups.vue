@@ -77,7 +77,7 @@ const enterMessage = async (row) => {
         }
       }
 
-      await router.push({path: '/chatroom/conversations'})
+      await router.push({path: '/' + store.data.path + '/chatroom/conversations'})
     } else if (res2.data === '0') {
       ElMessage.error("You're not in the group chat")
       await delay(1000); // 等待 1 秒

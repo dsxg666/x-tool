@@ -5,7 +5,7 @@ import {ElMessage} from "element-plus"
 import axiosUtilObj from '@/utils/axios.js'
 import localStoreUtilObj from '@/utils/localstore.js'
 import {infoStore} from '@/store/store.js'
-import { User, Lock } from '@element-plus/icons-vue'
+import {User, Lock} from '@element-plus/icons-vue'
 
 const store = infoStore()
 
@@ -144,6 +144,30 @@ const codeTabSubmit = () => {
 const font = reactive({
   color: 'rgba(0, 0, 0, .15)',
 })
+
+const loginWithGithub = () => {
+  // 获取当前浏览器窗口的宽度和高度
+  const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  const screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+  // 计算窗口的左上角位置
+  const left = (screenWidth - 500) / 2;
+  const top = (screenHeight - 500) / 2;
+  let url = import.meta.env.VITE_API_URL + '/api/base/loginByGithub'
+  window.open(url, 'GitHub', `height=500, width=500, top=${top}, left=${left}, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no`)
+}
+
+// 监听子窗口传递的信息
+window.addEventListener('message', function (e) {
+  if (e.origin === import.meta.env.VITE_API_URL) {
+    let token = e.data
+    let [headerBase64, payloadBase64, signatureBase64] = token.split('.')
+    let payload = atob(payloadBase64)
+    let payloadObj = JSON.parse(payload)
+    store.save(payloadObj.userId, payloadObj.username, payloadObj.exp, token, payloadObj.path)
+    router.push('/' + payloadObj.path)
+  }
+},false);
 </script>
 
 <template>
@@ -198,11 +222,13 @@ const font = reactive({
                 </el-button>
               </el-form-item>
               <div class="link-container">
-                <el-checkbox v-model="isRememberPass" label="Remember" />
+                <el-checkbox v-model="isRememberPass" label="Remember"/>
                 <el-link href="/register" target="_blank">Sign Up</el-link>
               </div>
               <div class="icon-container">
-                <font-awesome-icon class="github" :icon="['fab', 'github']"/>
+                <el-button link @click="loginWithGithub">
+                  <font-awesome-icon class="github" :icon="['fab', 'github']"/>
+                </el-button>
               </div>
             </el-form>
           </el-tab-pane>
@@ -264,7 +290,9 @@ const font = reactive({
                 </el-button>
               </el-form-item>
               <div class="icon-container">
-                <font-awesome-icon class="github" :icon="['fab', 'github']"/>
+                <el-button link @click="loginWithGithub">
+                  <font-awesome-icon class="github" :icon="['fab', 'github']"/>
+                </el-button>
               </div>
             </el-form>
           </el-tab-pane>
